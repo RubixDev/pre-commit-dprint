@@ -1,0 +1,45 @@
+name: Auto-update
+
+on:
+  push:
+    branches:
+    - main
+  schedule:
+  - cron: '0 0 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        cache: pip
+
+    - name: Install `pre-commit-mirror-maker`
+      run: pip install pre-commit-mirror-maker
+
+    - name: Configure Git
+      run: |
+        git config --global author.name "${GITHUB_ACTOR}"
+        git config --global author.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+        git config --global committer.name 'github-actions[bot]'
+        git config --global committer.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+    - run: |
+        pre-commit-mirror . \
+            --language rust \
+            --package-name dprint \
+            --types text \
+            --entry 'dprint fmt' \
+            --id dprint \
+            --description 'A pluggable and configurable code formatting platform written in Rust.'
+
+    - name: Push changes
+      run: git push origin HEAD:refs/heads/main --tags
