@@ -1,0 +1,10 @@
+-   id: dprint
+    name: dprint
+    description: 'A pluggable and configurable code formatting platform written in Rust.'
+    entry: dprint fmt
+    language: rust
+    'types': [text]
+    args: []
+    require_serial: false
+    additional_dependencies: ["cli:dprint:0.1.0-alpha"]
+    minimum_pre_commit_version: '0'
